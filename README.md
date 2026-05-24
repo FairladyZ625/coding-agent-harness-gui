@@ -2,6 +2,8 @@
 
 Local desktop/web PLM console for aggregating multiple Coding Agent Harness projects.
 
+GitHub: https://github.com/FairladyZ625/coding-agent-harness-gui
+
 This repository is intentionally separate from `coding-agent-harness` core. The
 core repository remains the document/CLI/kernel package; this GUI repository is
 the operator console that reads many Harness projects and routes approved write
