@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { PortfolioSnapshot, QueueItem, queueLabel } from "../../../model/harnessGui";
 import { ProjectSummary } from "../../../model/harnessGui";
 import { UiPreferences } from "../../../model/uiPreferences";
+import { cn } from "../../../shared/lib/cn";
 import { Button } from "../../../shared/ui/Button";
 import { ConsoleView } from "../../portfolio/model/usePortfolioConsole";
 import { EvidenceList } from "../../evidence/ui/EvidenceList";
@@ -38,28 +39,28 @@ export function QueueColumn(props: QueueColumnProps) {
   }[props.view];
 
   return (
-    <section className="queue-column">
-      <header className="topbar">
+    <section className="h-screen min-w-0 overflow-auto border-r border-border bg-secondary p-triple">
+      <header className="flex items-center justify-between gap-double">
         <div>
-          <p className="eyebrow">{t("app.subtitle")}</p>
-          <h1>{title}</h1>
+          <p className="mb-half text-xs uppercase tracking-wide text-low">{t("app.subtitle")}</p>
+          <h1 className="m-0 text-xl font-semibold text-high">{title}</h1>
         </div>
-        <div className="topbar-actions">
+        <div className="flex items-center gap-base">
           <Button variant="icon" onClick={props.onOpenCommandPalette} title={t("actions.command")} icon={<Command size={18} />} />
           <Button variant="icon" onClick={props.onRefresh} title={t("actions.refresh")} disabled={props.isRefreshing} icon={<RefreshCcw size={18} />} />
         </div>
       </header>
 
-      <div className="metric-strip">
+      <div className="mt-triple grid grid-cols-2 gap-base">
         <Metric icon={<Layers3 size={16} />} label={t("metrics.projects")} value={props.snapshot.portfolio.projectCount} />
         <Metric icon={<ShieldCheck size={16} />} label={t("metrics.review")} value={props.snapshot.portfolio.queueCounts.reviewNeeded} />
         <Metric icon={<AlertTriangle size={16} />} label={t("metrics.blocked")} value={props.snapshot.portfolio.queueCounts.blocked + props.snapshot.portfolio.queueCounts.reviewBlocked} />
         <Metric icon={<Gauge size={16} />} label={t("metrics.missing")} value={props.snapshot.portfolio.queueCounts.missingMaterials} />
       </div>
 
-      <label className="search-box">
+      <label className="mt-triple flex min-h-10 items-center gap-base rounded-sm border border-border bg-primary px-double text-low focus-within:border-brand">
         <Search size={16} />
-        <input value={props.query} onChange={(event) => props.onQueryChange(event.target.value)} placeholder={t("actions.search")} />
+        <input className="min-w-0 flex-1 border-0 bg-transparent text-normal outline-none placeholder:text-low" value={props.query} onChange={(event) => props.onQueryChange(event.target.value)} placeholder={t("actions.search")} />
       </label>
 
       {props.view === "projects" ? (
@@ -88,10 +89,10 @@ export function QueueColumn(props: QueueColumnProps) {
 
 function Metric(props: { icon: React.ReactNode; label: string; value: number }) {
   return (
-    <div className="metric">
+    <div className="rounded-sm border border-border bg-primary p-double text-sm text-low">
       {props.icon}
-      <span>{props.label}</span>
-      <strong>{props.value}</strong>
+      <span className="ml-base">{props.label}</span>
+      <strong className="mt-base block text-lg text-high">{props.value}</strong>
     </div>
   );
 }
@@ -103,23 +104,30 @@ function QueueList({ items, selectedTaskKey, onSelect }: { items: QueueItem[]; s
     return accumulator;
   }, {});
   return (
-    <div className="queue-list">
+    <div className="mt-triple grid gap-triple">
       {Object.entries(grouped).map(([queue, queueItems]) => (
-        <section className="queue-group" key={queue}>
-          <header>
+        <section className="grid gap-base" key={queue}>
+          <header className="flex items-center justify-between text-xs uppercase tracking-wide text-low">
             {queueLabel(queue as QueueItem["queue"])}
             <span>{queueItems.length}</span>
           </header>
           {queueItems.map((item) => (
-            <button key={item.id} className={`queue-card ${item.taskKey === selectedTaskKey ? "active" : ""}`} onClick={() => onSelect(item)}>
-              <div className="queue-card-top">
-                <span className={`queue-badge ${item.queue}`}>{queueLabel(item.queue)}</span>
-                <span className={`priority ${item.priority}`}>{item.priority}</span>
+            <button
+              key={item.id}
+              className={cn(
+                "w-full rounded-sm border border-border bg-primary p-double text-left transition-colors hover:border-brand hover:bg-panel",
+                item.taskKey === selectedTaskKey && "border-brand bg-panel"
+              )}
+              onClick={() => onSelect(item)}
+            >
+              <div className="flex items-center justify-between gap-base">
+                <QueueBadge queue={item.queue} />
+                <span className={cn("rounded-full px-base py-half text-xs", item.priority === "critical" || item.priority === "high" ? "bg-error/15 text-error" : item.priority === "normal" ? "bg-warning/15 text-warning" : "bg-panel text-low")}>{item.priority}</span>
               </div>
-              <h2>{item.title}</h2>
-              <p>{item.reason}</p>
-              <small>{item.exitCondition}</small>
-              <div className="queue-meta">
+              <h2 className="mt-base truncate text-base font-semibold text-high">{item.title}</h2>
+              <p className="mt-base line-clamp-2 text-sm text-normal">{item.reason}</p>
+              <small className="mt-base block text-xs text-low">{item.exitCondition}</small>
+              <div className="mt-double flex flex-wrap gap-base text-xs text-low">
                 <span>{item.projectId}</span>
                 <span>{item.staleState}</span>
                 <span>{item.sourceSnapshotHash.slice(0, 10)}</span>
@@ -130,4 +138,9 @@ function QueueList({ items, selectedTaskKey, onSelect }: { items: QueueItem[]; s
       ))}
     </div>
   );
+}
+
+function QueueBadge({ queue }: { queue: QueueItem["queue"] }) {
+  const tone = queue.includes("blocked") || queue === "blocked" ? "text-error bg-error/15" : queue === "missing-materials" ? "text-warning bg-warning/15" : "text-brand bg-brand/15";
+  return <span className={cn("rounded-full px-base py-half text-xs font-medium", tone)}>{queueLabel(queue)}</span>;
 }

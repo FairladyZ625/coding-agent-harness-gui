@@ -19,6 +19,10 @@
     "command": "命令",
     "search": "筛选任务、队列、证据"
   },
+  "commandPalette": {
+    "label": "命令面板",
+    "placeholder": "搜索命令、动作、布局"
+  },
   "metrics": {
     "projects": "项目",
     "review": "审查",

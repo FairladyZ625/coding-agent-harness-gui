@@ -19,58 +19,62 @@ export function SettingsPanel({ projects = [], preferences, onAddProject, onRemo
   const { theme, setTheme } = useTheme();
   const [projectPath, setProjectPath] = useState("");
   return (
-    <div className="settings-panel">
-      <h2>{t("settings.title")}</h2>
-      <p>{t("settings.body")}</p>
-      <div className="settings-grid">
+    <div className="mt-triple grid gap-triple text-sm">
+      <div>
+        <h2 className="text-base font-semibold text-high">{t("settings.title")}</h2>
+        <p className="mt-half text-low">{t("settings.body")}</p>
+      </div>
+      <div className="grid gap-triple">
         <div>
-          <strong>{t("settings.language")}</strong>
-          <div className="segmented">
+          <strong className="text-high">{t("settings.language")}</strong>
+          <div className="mt-base flex flex-wrap gap-base">
             <Button variant={i18n.language.startsWith("zh") ? "primary" : "secondary"} onClick={() => void i18n.changeLanguage("zh-Hans")}>中文</Button>
             <Button variant={i18n.language.startsWith("en") ? "primary" : "secondary"} onClick={() => void i18n.changeLanguage("en")}>{t("settings.english")}</Button>
           </div>
         </div>
         <div>
-          <strong>{t("settings.theme")}</strong>
-          <div className="segmented">
+          <strong className="text-high">{t("settings.theme")}</strong>
+          <div className="mt-base flex flex-wrap gap-base">
             <Button variant={theme === "dark" ? "primary" : "secondary"} onClick={() => setTheme("dark")}>{t("settings.dark")}</Button>
             <Button variant={theme === "light" ? "primary" : "secondary"} onClick={() => setTheme("light")}>{t("settings.light")}</Button>
           </div>
         </div>
         <div>
-          <strong>{t("settings.density")}</strong>
-          <div className="segmented">
+          <strong className="text-high">{t("settings.density")}</strong>
+          <div className="mt-base flex flex-wrap gap-base">
             <Button variant={preferences?.density === "compact" ? "primary" : "secondary"} onClick={() => onDensityChange?.("compact")}>{t("settings.compact")}</Button>
             <Button variant={preferences?.density !== "compact" ? "primary" : "secondary"} onClick={() => onDensityChange?.("comfortable")}>{t("settings.comfortable")}</Button>
           </div>
         </div>
         <div>
-          <strong>{t("settings.registry")}</strong>
-          <div className="registry-add">
-            <input value={projectPath} onChange={(event) => setProjectPath(event.target.value)} placeholder={t("settings.registryPlaceholder")} />
+          <strong className="text-high">{t("settings.registry")}</strong>
+          <div className="mt-base flex gap-base">
+            <input className="min-w-0 flex-1 rounded-sm border border-border bg-primary px-double py-base text-normal outline-none placeholder:text-low focus:border-brand" value={projectPath} onChange={(event) => setProjectPath(event.target.value)} placeholder={t("settings.registryPlaceholder")} />
             <Button onClick={() => {
               if (!projectPath.trim()) return;
               onAddProject?.(projectPath.trim());
               setProjectPath("");
             }}>{t("settings.addProject")}</Button>
           </div>
-          <div className="registry-list">
+          <div className="mt-base grid gap-base">
             {projects.map((project) => (
-              <div key={project.id} className="registry-row">
-                <span>
-                  <strong>{project.displayName}</strong>
-                  <em>{project.path}</em>
+              <div key={project.id} className="grid gap-base rounded-sm border border-border bg-primary p-base">
+                <span className="min-w-0">
+                  <strong className="block truncate text-high">{project.displayName}</strong>
+                  <em className="block truncate text-low">{project.path}</em>
                 </span>
-                <Button variant="ghost" onClick={() => onSetProjectEnabled?.(project.id, project.enabled === false)}>
-                  {project.enabled === false ? t("settings.enable") : t("settings.disable")}
-                </Button>
-                <Button variant="ghost" onClick={() => onRemoveProject?.(project.id)}>{t("settings.remove")}</Button>
+                <div className="flex gap-base">
+                  <Button variant="ghost" onClick={() => onSetProjectEnabled?.(project.id, project.enabled === false)}>
+                    {project.enabled === false ? t("settings.enable") : t("settings.disable")}
+                  </Button>
+                  <Button variant="ghost" onClick={() => onRemoveProject?.(project.id)}>{t("settings.remove")}</Button>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </div>
-      <ul>
+      <ul className="grid gap-half text-low">
         <li>{t("settings.packaging")}</li>
         <li>{t("settings.runner")}</li>
         <li>{t("settings.confirm")}</li>

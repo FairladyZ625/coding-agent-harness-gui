@@ -19,6 +19,10 @@
     "command": "Command",
     "search": "Filter tasks, queues, evidence"
   },
+  "commandPalette": {
+    "label": "Command palette",
+    "placeholder": "Search commands, actions, layout"
+  },
   "metrics": {
     "projects": "Projects",
     "review": "Review",
