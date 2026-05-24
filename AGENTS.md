@@ -5,9 +5,8 @@ This repository is the independent GUI module for `coding-agent-harness`.
 ## Operating Rule
 
 Task planning, review, progress, and module coordination stay in the parent
-private harness:
-
-`/Users/lizeyu/Projects/coding-agent-harness/.harness-private/docs/09-PLANNING/MODULES/gui/`
+private harness for the checkout that embeds this module. Do not add private
+planning material to this public GUI repository.
 
 Do not create ad hoc planning docs in this repository unless a module task
 explicitly says to do so.
@@ -22,5 +21,5 @@ explicitly says to do so.
 
 ## First Read
 
-- Parent strategy: `/Users/lizeyu/Projects/coding-agent-harness/.harness-private/docs/09-PLANNING/TASKS/2026-05-24-harness-gui-plm-console-strategy/strategy.md`
-- Module plan: `/Users/lizeyu/Projects/coding-agent-harness/.harness-private/docs/09-PLANNING/MODULES/gui/module_plan.md`
+- Parent strategy task in the embedding repository's private harness.
+- GUI module plan in the embedding repository's private harness.
