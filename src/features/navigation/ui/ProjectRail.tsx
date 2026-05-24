@@ -24,7 +24,7 @@ export function ProjectRail({ view, projects, selectedProjectId, collapsed, onVi
   ];
 
   return (
-    <aside className="h-screen min-w-0 overflow-auto border-r border-border bg-secondary px-base py-triple text-normal" aria-label={t("nav.projects")}>
+    <aside className="h-screen min-w-0 overflow-auto border-r border-border bg-panel px-base py-triple text-normal" aria-label={t("nav.projects")}>
       <div className={cn("flex min-h-11 items-center gap-base px-base font-semibold text-high", collapsed && "justify-center px-0")}>
         <Workflow size={20} />
         {!collapsed ? <span className="min-w-0 truncate">{t("app.name")}</span> : null}

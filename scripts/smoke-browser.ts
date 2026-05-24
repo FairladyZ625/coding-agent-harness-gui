@@ -93,7 +93,11 @@ await page.waitForTimeout(300);
 const lightMetrics = await page.evaluate(() => ({
   theme: document.documentElement.dataset.theme,
   bodyBg: getComputedStyle(document.body).backgroundColor,
-  railBg: getComputedStyle(document.querySelector("aside")!).backgroundColor
+  railBg: getComputedStyle(document.querySelector("aside")!).backgroundColor,
+  queueBg: getComputedStyle(document.querySelector(".console-shell > section")!).backgroundColor,
+  panelSurfaces: Array.from(document.querySelectorAll("[data-panel-surface]"))
+    .map((element) => (element as HTMLElement).dataset.panelSurface)
+    .filter(Boolean)
 }));
 await page.screenshot({ path: path.join(screenshotDir, "gui-ds-light.png"), fullPage: true });
 
@@ -103,12 +107,24 @@ await page.getByText("Coding Agent Harness").first().waitFor({ timeout: 15_000 }
 const tabletMetrics = await page.evaluate(() => ({
   scrollWidth: document.documentElement.scrollWidth,
   clientWidth: document.documentElement.clientWidth,
+  scrollHeight: document.documentElement.scrollHeight,
   shellDisplay: getComputedStyle(document.querySelector(".console-shell")!).display,
+  taskTitleTop: document.querySelector("main h2")?.getBoundingClientRect().top ?? null,
+  taskActionsTop: Array.from(document.querySelectorAll("main button"))
+    .find((button) => button.textContent?.trim())
+    ?.getBoundingClientRect().top ?? null,
   clippedChildren: Array.from(document.querySelector(".console-shell")!.children)
     .map((element) => {
       const rect = element.getBoundingClientRect();
       const style = getComputedStyle(element);
       return { tag: element.tagName, display: style.display, left: rect.left, right: rect.right, width: rect.width };
+    })
+    .filter((rect) => rect.display !== "none" && rect.width > 0 && (rect.left < -1 || rect.right > document.documentElement.clientWidth + 1)),
+  clippedVisibleElements: Array.from(document.querySelectorAll("main *, .console-shell > section *"))
+    .map((element) => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return { tag: element.tagName, text: element.textContent?.slice(0, 48), display: style.display, left: rect.left, right: rect.right, width: rect.width };
     })
     .filter((rect) => rect.display !== "none" && rect.width > 0 && (rect.left < -1 || rect.right > document.documentElement.clientWidth + 1))
 }));
@@ -119,13 +135,25 @@ await page.getByText("Coding Agent Harness").first().waitFor({ timeout: 15_000 }
 const mobileMetrics = await page.evaluate(() => ({
   scrollWidth: document.documentElement.scrollWidth,
   clientWidth: document.documentElement.clientWidth,
+  scrollHeight: document.documentElement.scrollHeight,
   hasHorizontalOverflow: document.documentElement.scrollWidth > document.documentElement.clientWidth,
   shellDisplay: getComputedStyle(document.querySelector(".console-shell")!).display,
+  taskTitleTop: document.querySelector("main h2")?.getBoundingClientRect().top ?? null,
+  taskActionsTop: Array.from(document.querySelectorAll("main button"))
+    .find((button) => button.textContent?.trim())
+    ?.getBoundingClientRect().top ?? null,
   clippedChildren: Array.from(document.querySelector(".console-shell")!.children)
     .map((element) => {
       const rect = element.getBoundingClientRect();
       const style = getComputedStyle(element);
       return { tag: element.tagName, display: style.display, left: rect.left, right: rect.right, width: rect.width };
+    })
+    .filter((rect) => rect.display !== "none" && rect.width > 0 && (rect.left < -1 || rect.right > document.documentElement.clientWidth + 1)),
+  clippedVisibleElements: Array.from(document.querySelectorAll("main *, .console-shell > section *"))
+    .map((element) => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return { tag: element.tagName, text: element.textContent?.slice(0, 48), display: style.display, left: rect.left, right: rect.right, width: rect.width };
     })
     .filter((rect) => rect.display !== "none" && rect.width > 0 && (rect.left < -1 || rect.right > document.documentElement.clientWidth + 1))
 }));
@@ -157,9 +185,19 @@ if (!desktopMetrics.resizeStoredWidth || desktopMetrics.resizeStoredWidth <= 360
 if (desktopMetrics.resizeReloadStoredWidth !== desktopMetrics.resizeStoredWidth) process.exit(11);
 if (Math.abs(desktopMetrics.resizeReloadWidth - desktopMetrics.resizeAfterWidth) > 2) process.exit(12);
 if (lightMetrics.theme !== "light") process.exit(4);
+if (new Set(lightMetrics.panelSurfaces).size < 3) process.exit(16);
+if (lightMetrics.bodyBg === lightMetrics.railBg || lightMetrics.railBg === lightMetrics.queueBg) process.exit(17);
 if (tabletMetrics.scrollWidth > tabletMetrics.clientWidth) process.exit(13);
-if (tabletMetrics.shellDisplay !== "block") process.exit(14);
+if (tabletMetrics.shellDisplay !== "flex") process.exit(14);
 if (tabletMetrics.clippedChildren.length) process.exit(15);
+if (tabletMetrics.clippedVisibleElements.length) process.exit(24);
+if ((tabletMetrics.taskTitleTop ?? Number.POSITIVE_INFINITY) > 240) process.exit(18);
+if ((tabletMetrics.taskActionsTop ?? Number.POSITIVE_INFINITY) > 420) process.exit(19);
+if (tabletMetrics.scrollHeight > 5_500) process.exit(20);
 if (mobileMetrics.hasHorizontalOverflow) process.exit(5);
-if (mobileMetrics.shellDisplay !== "block") process.exit(7);
+if (mobileMetrics.shellDisplay !== "flex") process.exit(7);
 if (mobileMetrics.clippedChildren.length) process.exit(8);
+if (mobileMetrics.clippedVisibleElements.length) process.exit(25);
+if ((mobileMetrics.taskTitleTop ?? Number.POSITIVE_INFINITY) > 220) process.exit(21);
+if ((mobileMetrics.taskActionsTop ?? Number.POSITIVE_INFINITY) > 390) process.exit(22);
+if (mobileMetrics.scrollHeight > 5_800) process.exit(23);

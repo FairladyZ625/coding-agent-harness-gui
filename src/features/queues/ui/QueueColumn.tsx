@@ -4,7 +4,9 @@ import { PortfolioSnapshot, QueueItem, queueLabel } from "../../../model/harness
 import { ProjectSummary } from "../../../model/harnessGui";
 import { UiPreferences } from "../../../model/uiPreferences";
 import { cn } from "../../../shared/lib/cn";
+import { Badge } from "../../../shared/ui/Badge";
 import { Button } from "../../../shared/ui/Button";
+import { QueueBadge } from "./QueueBadge";
 import { ConsoleView } from "../../portfolio/model/usePortfolioConsole";
 import { EvidenceList } from "../../evidence/ui/EvidenceList";
 import { ProjectList } from "../../projects/ui/ProjectList";
@@ -89,7 +91,7 @@ export function QueueColumn(props: QueueColumnProps) {
 
 function Metric(props: { icon: React.ReactNode; label: string; value: number }) {
   return (
-    <div className="rounded-sm border border-border bg-primary p-double text-sm text-low">
+    <div className="rounded-sm border border-border bg-panel p-double text-sm text-low">
       {props.icon}
       <span className="ml-base">{props.label}</span>
       <strong className="mt-base block text-lg text-high">{props.value}</strong>
@@ -104,9 +106,9 @@ function QueueList({ items, selectedTaskKey, onSelect }: { items: QueueItem[]; s
     return accumulator;
   }, {});
   return (
-    <div className="mt-triple grid gap-triple">
+    <div className="mt-triple grid min-w-0 gap-triple">
       {Object.entries(grouped).map(([queue, queueItems]) => (
-        <section className="grid gap-base" key={queue}>
+        <section className="grid min-w-0 gap-base" key={queue}>
           <header className="flex items-center justify-between text-xs uppercase tracking-wide text-low">
             {queueLabel(queue as QueueItem["queue"])}
             <span>{queueItems.length}</span>
@@ -115,20 +117,20 @@ function QueueList({ items, selectedTaskKey, onSelect }: { items: QueueItem[]; s
             <button
               key={item.id}
               className={cn(
-                "w-full rounded-sm border border-border bg-primary p-double text-left transition-colors hover:border-brand hover:bg-panel",
+                "min-w-0 overflow-hidden rounded-sm border border-border bg-primary p-double text-left transition-colors hover:border-brand hover:bg-panel",
                 item.taskKey === selectedTaskKey && "border-brand bg-panel"
               )}
               onClick={() => onSelect(item)}
             >
-              <div className="flex items-center justify-between gap-base">
+              <div className="flex min-w-0 items-center justify-between gap-base">
                 <QueueBadge queue={item.queue} />
-                <span className={cn("rounded-full px-base py-half text-xs", item.priority === "critical" || item.priority === "high" ? "bg-error/15 text-error" : item.priority === "normal" ? "bg-warning/15 text-warning" : "bg-panel text-low")}>{item.priority}</span>
+                <Badge tone={priorityTone(item.priority)}>{item.priority}</Badge>
               </div>
               <h2 className="mt-base truncate text-base font-semibold text-high">{item.title}</h2>
               <p className="mt-base line-clamp-2 text-sm text-normal">{item.reason}</p>
               <small className="mt-base block text-xs text-low">{item.exitCondition}</small>
-              <div className="mt-double flex flex-wrap gap-base text-xs text-low">
-                <span>{item.projectId}</span>
+              <div className="mt-double flex min-w-0 flex-wrap gap-base text-xs text-low">
+                <span className="max-w-full truncate">{item.projectId}</span>
                 <span>{item.staleState}</span>
                 <span>{item.sourceSnapshotHash.slice(0, 10)}</span>
               </div>
@@ -140,7 +142,8 @@ function QueueList({ items, selectedTaskKey, onSelect }: { items: QueueItem[]; s
   );
 }
 
-function QueueBadge({ queue }: { queue: QueueItem["queue"] }) {
-  const tone = queue.includes("blocked") || queue === "blocked" ? "text-error bg-error/15" : queue === "missing-materials" ? "text-warning bg-warning/15" : "text-brand bg-brand/15";
-  return <span className={cn("rounded-full px-base py-half text-xs font-medium", tone)}>{queueLabel(queue)}</span>;
+function priorityTone(priority: QueueItem["priority"]) {
+  if (priority === "critical" || priority === "high") return "danger";
+  if (priority === "normal") return "warning";
+  return "neutral";
 }
