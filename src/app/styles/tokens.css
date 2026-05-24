@@ -1,0 +1,172 @@
+@layer base {
+  :root {
+    color-scheme: light;
+    --_background: 0 0% 95%;
+    --_foreground: 0 0% 5%;
+    --_primary: 0 0% 5%;
+    --_primary-foreground: 0 0% 100%;
+    --_secondary: 0 0% 95%;
+    --_secondary-foreground: 0 0% 16%;
+    --_muted: 0 0% 89%;
+    --_muted-foreground: 0 0% 56%;
+    --_accent: 0 0% 92%;
+    --_accent-foreground: 0 0% 5%;
+    --_destructive: 0 59% 57%;
+    --_destructive-foreground: 0 0% 100%;
+    --_border: 0 0% 85%;
+    --_input: 0 0% 96%;
+    --_ring: 0 0% 5%;
+    --_radius: 0.125rem;
+    --text-high: 0 0% 5%;
+    --text-normal: 0 0% 20%;
+    --text-low: 0 0% 39%;
+    --_bg-primary-default: 0 0% 100%;
+    --_bg-secondary-default: 0 0% 95%;
+    --_bg-panel-default: 0 0% 89%;
+    --bg-primary: var(--_bg-primary-default);
+    --bg-secondary: var(--_bg-secondary-default);
+    --bg-panel: var(--_bg-panel-default);
+    --brand: 25 82% 54%;
+    --brand-hover: 25 75% 62%;
+    --brand-secondary: 25 82% 37%;
+    --error: 0 59% 57%;
+    --success: 117 38% 50%;
+    --warning: 32 95% 44%;
+    --info: 217 91% 60%;
+    --merged: 271 81% 46%;
+    --neutral: 0 0% 92%;
+    --neutral-foreground: 0 0% 5%;
+    --text-on-brand: 0 0% 100%;
+    --background: var(--_background);
+    --foreground: var(--_foreground);
+    --card: var(--_muted);
+    --card-foreground: var(--_muted-foreground);
+    --popover: var(--_background);
+    --popover-foreground: var(--_foreground);
+    --primary: var(--_primary);
+    --primary-foreground: var(--_primary-foreground);
+    --secondary: var(--_secondary);
+    --secondary-foreground: var(--_secondary-foreground);
+    --muted: var(--_muted);
+    --muted-foreground: var(--_muted-foreground);
+    --accent: var(--_accent);
+    --accent-foreground: var(--_accent-foreground);
+    --destructive: var(--_destructive);
+    --destructive-foreground: var(--_destructive-foreground);
+    --border: var(--_border);
+    --input: var(--_input);
+    --ring: var(--_ring);
+    --radius: var(--_radius);
+    --spacing-half: 0.25rem;
+    --spacing-base: 0.5rem;
+    --spacing-plusfifty: 0.75rem;
+    --spacing-double: 1rem;
+    --spacing-triple: 1.5rem;
+    --size-icon-xs: 0.9375rem;
+    --size-icon-sm: 1.09375rem;
+    --size-icon-base: 1.25rem;
+    --size-dot: 0.3rem;
+    --font-sans: "IBM Plex Sans", "Noto Emoji", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --_background: 0 0% 13%;
+    --_foreground: 0 0% 96%;
+    --_primary: 240 4.8% 95.9%;
+    --_primary-foreground: 240 5.9% 10%;
+    --_secondary: 0 0% 12%;
+    --_secondary-foreground: 0 0% 77%;
+    --_muted: 0 0% 16%;
+    --_muted-foreground: 0 0% 64%;
+    --_accent: 0 0% 20%;
+    --_accent-foreground: 0 0% 96%;
+    --_destructive: 0 59% 57%;
+    --_destructive-foreground: 0 0% 96%;
+    --_border: 0 0% 20%;
+    --_input: 0 0% 20%;
+    --_ring: 0 0% 77%;
+    --text-high: 0 0% 96%;
+    --text-normal: 0 0% 77%;
+    --text-low: 0 0% 56%;
+    --_bg-primary-default: 0 0% 13%;
+    --_bg-secondary-default: 0 0% 11%;
+    --_bg-panel-default: 0 0% 16%;
+    --brand: 25 82% 54%;
+    --brand-hover: 25 75% 62%;
+    --brand-secondary: 25 82% 37%;
+    --error: 0 59% 57%;
+    --success: 117 38% 50%;
+    --warning: 32.2 95% 44.1%;
+    --info: 217.2 91.2% 59.8%;
+    --merged: 271 81% 66%;
+    --neutral: 0 0% 20%;
+    --neutral-foreground: 0 0% 90%;
+  }
+
+  html,
+  body,
+  #root {
+    min-height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: hsl(var(--bg-primary));
+    color: hsl(var(--text-normal));
+    font-family: var(--font-sans);
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  button {
+    color: inherit;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@theme {
+  --color-high: hsl(var(--text-high));
+  --color-normal: hsl(var(--text-normal));
+  --color-low: hsl(var(--text-low));
+  --color-primary: hsl(var(--bg-primary));
+  --color-secondary: hsl(var(--bg-secondary));
+  --color-panel: hsl(var(--bg-panel));
+  --color-brand: hsl(var(--brand));
+  --color-brand-hover: hsl(var(--brand-hover));
+  --color-brand-secondary: hsl(var(--brand-secondary));
+  --color-error: hsl(var(--error));
+  --color-success: hsl(var(--success));
+  --color-warning: hsl(var(--warning));
+  --color-info: hsl(var(--info));
+  --color-merged: hsl(var(--merged));
+  --color-on-brand: hsl(var(--text-on-brand));
+  --color-background: hsl(var(--bg-primary));
+  --color-foreground: hsl(var(--text-normal));
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--accent));
+  --color-destructive: hsl(var(--destructive));
+  --spacing-half: var(--spacing-half);
+  --spacing-base: var(--spacing-base);
+  --spacing-plusfifty: var(--spacing-plusfifty);
+  --spacing-double: var(--spacing-double);
+  --spacing-triple: var(--spacing-triple);
+  --radius-sm: var(--radius);
+  --radius-md: calc(var(--radius) * 1.75);
+  --radius-lg: calc(var(--radius) * 2.5);
+  --font-ibm-plex-sans: var(--font-sans);
+  --font-ibm-plex-mono: var(--font-mono);
+  --animate-running-dot-1: running-dot 1.4s ease-in-out infinite;
+  --animate-running-dot-2: running-dot 1.4s ease-in-out 0.2s infinite;
+  --animate-running-dot-3: running-dot 1.4s ease-in-out 0.4s infinite;
+}

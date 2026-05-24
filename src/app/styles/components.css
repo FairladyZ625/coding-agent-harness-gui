@@ -1,0 +1,71 @@
+@layer components {
+  .console-shell {
+    grid-template-columns: var(--rail-width, 220px) var(--visible-queue-width, 360px) 6px minmax(420px, var(--visible-workspace-width, 560px)) 6px minmax(var(--visible-inspector-width, 280px), 1fr);
+  }
+
+  .console-shell-left-collapsed {
+    grid-template-columns: var(--rail-width, 72px) var(--visible-queue-width, 360px) 6px minmax(420px, var(--visible-workspace-width, 560px)) 6px minmax(var(--visible-inspector-width, 280px), 1fr);
+  }
+
+  .console-shell-right-collapsed {
+    grid-template-columns: var(--rail-width, 220px) var(--visible-queue-width, 360px) 6px minmax(420px, 1fr) 6px var(--visible-inspector-width, 44px);
+  }
+
+  .console-shell-left-collapsed.console-shell-right-collapsed {
+    grid-template-columns: var(--rail-width, 72px) var(--visible-queue-width, 360px) 6px minmax(420px, 1fr) 6px var(--visible-inspector-width, 44px);
+  }
+
+  .console-density-compact {
+    --spacing-triple: 1rem;
+  }
+
+  .console-density-comfortable {
+    --spacing-triple: 1.5rem;
+  }
+
+  .console-resizer {
+    width: 6px;
+    cursor: col-resize;
+  }
+
+  .vertical-writing {
+    writing-mode: vertical-rl;
+  }
+
+  @keyframes running-dot {
+    0%,
+    100% {
+      opacity: 0.3;
+    }
+
+    50% {
+      opacity: 1;
+    }
+  }
+}
+
+@media (max-width: 1211px) {
+  .console-shell,
+  .console-shell-left-collapsed,
+  .console-shell-right-collapsed,
+  .console-shell-left-collapsed.console-shell-right-collapsed {
+    display: block;
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+
+  .console-shell > aside,
+  .console-shell > main,
+  .console-shell > section {
+    width: 100%;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    border-right: 0;
+  }
+
+  .console-resizer {
+    display: none;
+  }
+}
