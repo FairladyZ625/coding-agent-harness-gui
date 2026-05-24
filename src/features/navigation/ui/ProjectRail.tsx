@@ -1,4 +1,4 @@
-import { FileSearch, Settings, ShieldCheck, SquareStack, Workflow } from "lucide-react";
+import { FileSearch, PanelLeftClose, PanelLeftOpen, Settings, ShieldCheck, SquareStack, Workflow } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ProjectSummary } from "../../../model/harnessGui";
 import { ConsoleView } from "../../portfolio/model/usePortfolioConsole";
@@ -7,11 +7,13 @@ interface ProjectRailProps {
   view: ConsoleView;
   projects: ProjectSummary[];
   selectedProjectId?: string;
+  collapsed: boolean;
   onViewChange: (view: ConsoleView) => void;
   onProjectSelect: (project: ProjectSummary) => void;
+  onToggleCollapsed: () => void;
 }
 
-export function ProjectRail({ view, projects, selectedProjectId, onViewChange, onProjectSelect }: ProjectRailProps) {
+export function ProjectRail({ view, projects, selectedProjectId, collapsed, onViewChange, onProjectSelect, onToggleCollapsed }: ProjectRailProps) {
   const { t } = useTranslation("common");
   const nav = [
     { key: "projects" as const, label: t("nav.projects"), icon: <SquareStack size={18} /> },
@@ -21,10 +23,13 @@ export function ProjectRail({ view, projects, selectedProjectId, onViewChange, o
   ];
 
   return (
-    <aside className="project-rail" aria-label={t("nav.projects")}>
+    <aside className={`project-rail ${collapsed ? "collapsed" : ""}`} aria-label={t("nav.projects")}>
       <div className="brand-mark">
         <Workflow size={20} />
         <span>{t("app.name")}</span>
+        <button className="sidebar-toggle" onClick={onToggleCollapsed} title={collapsed ? "Expand rail" : "Collapse rail"}>
+          {collapsed ? <PanelLeftOpen size={15} /> : <PanelLeftClose size={15} />}
+        </button>
       </div>
       <nav className="rail-nav" aria-label="Main navigation">
         {nav.map((item) => (

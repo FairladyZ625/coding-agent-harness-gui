@@ -1,4 +1,4 @@
-import { PortfolioSnapshot, TaskDetail } from "../model/harnessGui";
+import { PortfolioSnapshot, ProjectSummary, TaskDetail, TaskMaterial } from "../model/harnessGui";
 import { createSyntheticPortfolio } from "../fixtures/portfolio";
 
 export async function fetchSnapshot(): Promise<PortfolioSnapshot> {
@@ -16,6 +16,48 @@ export async function fetchTaskDetail(projectId: string, taskKey: string): Promi
     const response = await fetch(`/api/projects/${projectId}/tasks/${encodeURIComponent(taskKey)}`);
     if (!response.ok) throw new Error(`API returned ${response.status}`);
     return (await response.json()) as TaskDetail;
+  } catch {
+    return undefined;
+  }
+}
+
+export async function fetchProjects(): Promise<ProjectSummary[]> {
+  const response = await fetch("/api/projects");
+  if (!response.ok) throw new Error(`API returned ${response.status}`);
+  return (await response.json()) as ProjectSummary[];
+}
+
+export async function addRegistryProject(path: string): Promise<ProjectSummary[]> {
+  const response = await fetch("/api/projects", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ path })
+  });
+  if (!response.ok) throw new Error(`API returned ${response.status}`);
+  return (await response.json()) as ProjectSummary[];
+}
+
+export async function removeRegistryProject(projectId: string): Promise<ProjectSummary[]> {
+  const response = await fetch(`/api/projects/${projectId}`, { method: "DELETE" });
+  if (!response.ok) throw new Error(`API returned ${response.status}`);
+  return (await response.json()) as ProjectSummary[];
+}
+
+export async function setRegistryProjectEnabled(projectId: string, enabled: boolean): Promise<ProjectSummary[]> {
+  const response = await fetch(`/api/projects/${projectId}/enabled`, {
+    method: "PATCH",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ enabled })
+  });
+  if (!response.ok) throw new Error(`API returned ${response.status}`);
+  return (await response.json()) as ProjectSummary[];
+}
+
+export async function fetchTaskMaterial(projectId: string, taskKey: string, materialName: string): Promise<TaskMaterial | undefined> {
+  try {
+    const response = await fetch(`/api/projects/${projectId}/tasks/${encodeURIComponent(taskKey)}/materials/${encodeURIComponent(materialName)}`);
+    if (!response.ok) throw new Error(`API returned ${response.status}`);
+    return (await response.json()) as TaskMaterial;
   } catch {
     return undefined;
   }

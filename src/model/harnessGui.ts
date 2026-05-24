@@ -33,6 +33,7 @@ export interface ProjectSummary {
   id: string;
   displayName: string;
   path: string;
+  enabled?: boolean;
   dataClass: DataClass;
   health: ProjectHealth;
   queueCounts: QueueCounts;
@@ -97,13 +98,35 @@ export interface ActionDescriptor {
   id: string;
   projectId: string;
   taskKey?: string;
-  kind: "open-path" | "copy-repair-prompt" | "review-confirm";
+  kind:
+    | "open-path"
+    | "copy-repair-prompt"
+    | "review-confirm"
+    | "refresh-scan"
+    | "switch-project"
+    | "focus-queue"
+    | "toggle-left-sidebar"
+    | "toggle-right-sidebar"
+    | "reset-layout";
   label: string;
   enabled: boolean;
   previewOnly: boolean;
+  status?: "ready" | "preview-only" | "disabled" | "stale" | "error";
   reason?: string;
+  shortcut?: string;
   sourceSnapshotHash?: string;
   sourceFileHashes?: Record<string, string>;
+}
+
+export interface TaskMaterial {
+  id: string;
+  name: string;
+  type: EvidenceEntry["type"];
+  sourcePath: string;
+  dataClass: DataClass;
+  status: "present" | "missing";
+  hash?: string;
+  snippet?: string;
 }
 
 export interface PortfolioSnapshot {
@@ -125,6 +148,9 @@ export interface PortfolioSnapshot {
 
 export interface TaskDetail extends TaskSummary {
   contractFiles: EvidenceEntry[];
+  materials: TaskMaterial[];
+  artifactCount: number;
+  findingCount: number;
   reviewGate: {
     canConfirm: boolean;
     previewOnly: boolean;

@@ -4,11 +4,13 @@ import path from "node:path";
 import { pathToFileURL } from "node:url";
 import {
   ActionDescriptor,
+  DataClass,
   EvidenceEntry,
   PortfolioSnapshot,
   ProjectSummary,
   QueueKey,
   TaskDetail,
+  TaskMaterial,
   TaskSummary,
   emptyQueueCounts,
   queueToCountKey,
@@ -22,6 +24,9 @@ export interface RegisteredProject {
   id: string;
   displayName: string;
   path: string;
+  enabled?: boolean;
+  dataClass?: DataClass;
+  lastScanAt?: string;
   synthetic?: boolean;
 }
 
@@ -60,7 +65,7 @@ export function defaultProjects(): RegisteredProject[] {
 }
 
 export async function buildPortfolio(projects: RegisteredProject[] = defaultProjects()): Promise<PortfolioSnapshot> {
-  const scanResults = await runWithConcurrency(projects, 3, scanProject);
+  const scanResults = await runWithConcurrency(projects.filter((project) => project.enabled !== false), 3, scanProject);
   const realProjects = scanResults.map((result) => result.project);
   const tasks = scanResults.flatMap((result) => result.tasks).map(sanitizeTaskForGlobal);
   const evidence = scanResults.flatMap((result) => result.evidence).map(sanitizeEvidenceForGlobal);
@@ -128,8 +133,8 @@ export async function scanProject(project: RegisteredProject): Promise<ScanResul
   const projectSummary: ProjectSummary = {
     id: project.id,
     displayName: project.displayName,
-    path: projectPath,
-    dataClass: "local-path",
+    path: `project:${project.id}`,
+    dataClass: "index-safe",
     health: {
       status,
       warnings: missingCount,
@@ -165,6 +170,11 @@ export async function getTaskDetail(projects: RegisteredProject[], projectId: st
     return {
       ...task,
       contractFiles: synthetic.evidence.filter((entry) => entry.projectId === projectId && entry.taskKey === taskKey),
+      materials: synthetic.evidence
+        .filter((entry) => entry.projectId === projectId && entry.taskKey === taskKey)
+        .map((entry) => evidenceToMaterial(entry, task.sourceFileHashes[path.basename(entry.sourcePath)])),
+      artifactCount: 0,
+      findingCount: 0,
       reviewGate: {
         canConfirm: task.queues.includes("review-needed") && task.staleState === "fresh",
         previewOnly: true,
@@ -177,10 +187,14 @@ export async function getTaskDetail(projects: RegisteredProject[], projectId: st
   const task = scan.tasks.find((candidate) => candidate.projectId === projectId && candidate.taskKey === taskKey);
   if (!task) return undefined;
   const contractFiles = scan.evidence.filter((entry) => entry.projectId === projectId && entry.taskKey === taskKey);
+  const materials = buildMaterialsForTask(project.path, task);
   const canConfirm = task.queues.includes("review-needed") && task.staleState === "fresh";
   return {
     ...task,
     contractFiles,
+    materials,
+    artifactCount: materials.filter((material) => material.type === "artifact").length,
+    findingCount: countFindingRows(path.join(findTaskDirectory(project.path, task.taskKey) ?? "", "findings.md")),
     reviewGate: {
       canConfirm,
       previewOnly: true,
@@ -189,6 +203,32 @@ export async function getTaskDetail(projects: RegisteredProject[], projectId: st
         : "Task is stale or not in Review Needed; refresh the project before action.",
       displayedHash: task.sourceSnapshotHash
     }
+  };
+}
+
+export async function getTaskMaterial(
+  projects: RegisteredProject[],
+  projectId: string,
+  taskKey: string,
+  materialName: string
+): Promise<TaskMaterial | undefined> {
+  const project = projects.find((candidate) => candidate.id === projectId);
+  if (!project) return undefined;
+  const taskDir = findTaskDirectory(project.path, taskKey);
+  if (!taskDir) return undefined;
+  const safeName = contractFiles.find((candidate) => candidate === materialName);
+  if (!safeName) return undefined;
+  const fullPath = path.join(taskDir, safeName);
+  if (!fs.existsSync(fullPath)) return { id: `${projectId}:${taskKey}:${safeName}`, name: safeName, type: evidenceType(safeName), sourcePath: `task:${taskKey}/${safeName}`, dataClass: "index-safe", status: "missing" };
+  return {
+    id: `${projectId}:${taskKey}:${safeName}`,
+    name: safeName,
+    type: evidenceType(safeName),
+    sourcePath: `task:${taskKey}/${safeName}`,
+    dataClass: "sensitive-on-demand",
+    status: "present",
+    hash: hashText(readIfExists(fullPath)),
+    snippet: redactSnippet(readIfExists(fullPath))
   };
 }
 
@@ -290,15 +330,15 @@ function buildTask(project: RegisteredProject, projectPath: string, docsRoot: st
     taskKey,
     title,
     projectId: project.id,
-    projectPath,
-    currentPath: relativeTaskDir,
+    projectPath: project.id,
+    currentPath: `task:${taskKey}`,
     moduleKey,
     lifecycleState,
     reviewStatus,
     materialsReady,
     queues,
     queueReasons,
-    repairPrompt: `Open ${relativeTaskDir}, resolve ${queues.join(", ")}, then rerun Harness checks.`,
+    repairPrompt: `Open task ${taskKey}, resolve ${queues.join(", ")}, then rerun Harness checks.`,
     sourceFileHashes,
     sourceSnapshotHash,
     scannerVersion,
@@ -318,10 +358,39 @@ function buildEvidenceForTask(task: TaskSummary): EvidenceEntry[] {
       taskKey: task.taskKey,
       title: file,
       type: evidenceType(file),
-      sourcePath: `${task.currentPath}/${file}`,
+      sourcePath: `task:${task.taskKey}/${file}`,
       dataClass: "index-safe",
       sourceSnapshotHash: task.sourceSnapshotHash
     }));
+}
+
+function buildMaterialsForTask(projectPath: string, task: TaskSummary): TaskMaterial[] {
+  const taskDir = findTaskDirectory(projectPath, task.taskKey);
+  return contractFiles.map((file) => {
+    const fullPath = taskDir ? path.join(taskDir, file) : "";
+    const present = Boolean(fullPath && fs.existsSync(fullPath));
+    return {
+      id: `${task.projectId}:${task.taskKey}:${file}`,
+      name: file,
+      type: evidenceType(file),
+      sourcePath: `task:${task.taskKey}/${file}`,
+      dataClass: present ? "sensitive-on-demand" : "index-safe",
+      status: present ? "present" : "missing",
+      hash: task.sourceFileHashes[file]
+    };
+  });
+}
+
+function evidenceToMaterial(entry: EvidenceEntry, hash?: string): TaskMaterial {
+  return {
+    id: entry.id,
+    name: path.basename(entry.sourcePath),
+    type: entry.type,
+    sourcePath: entry.sourcePath,
+    dataClass: "index-safe",
+    status: "present",
+    hash
+  };
 }
 
 function buildActionsForTask(task: TaskSummary): ActionDescriptor[] {
@@ -445,8 +514,8 @@ function missingProject(project: RegisteredProject, reason: string): ScanResult 
     project: {
       id: project.id,
       displayName: project.displayName,
-      path: path.resolve(project.path),
-      dataClass: "local-path",
+      path: `project:${project.id}`,
+      dataClass: "index-safe",
       health: { status: "unknown", warnings: 0, failures: 1, summary: reason },
       queueCounts: counts,
       moduleSummary: {},
@@ -463,6 +532,26 @@ function missingProject(project: RegisteredProject, reason: string): ScanResult 
     docsBytes: 0,
     errors: [reason]
   };
+}
+
+function findTaskDirectory(projectPath: string, taskKey: string): string | undefined {
+  const docsRoot = resolveDocsRoot(path.resolve(projectPath));
+  if (!docsRoot) return undefined;
+  return listTaskDirectories(docsRoot).find((taskDir) => path.basename(taskDir) === taskKey);
+}
+
+function countFindingRows(findingsPath: string): number {
+  const text = readIfExists(findingsPath);
+  return text.split("\n").filter((line) => /^\|\s*R?F?-\d+/i.test(line)).length;
+}
+
+function redactSnippet(text: string): string {
+  return text
+    .slice(0, 1600)
+    .replace(/Task Contract:[^\n]*/g, "[redacted-private-marker]")
+    .replace(/PRIVATE:[^\s)]+/g, "[redacted-private-marker]")
+    .replace(/\.harness-private/g, "[redacted-private-marker]")
+    .replace(/##\s*步骤/g, "## [redacted-private-marker]");
 }
 
 function listMarkdownFiles(root: string): string[] {
