@@ -50,7 +50,21 @@
     "body": "项目注册表保存在本地。全局 payload 只保留索引安全字段。原始私有文件只在后续受控路径中按需加载。",
     "packaging": "桌面打包后置。",
     "runner": "Agent runner 后置。",
-    "confirm": "Review confirm 在接入 Harness CLI/core action 前保持 preview-only。"
+    "confirm": "Review confirm 在接入 Harness CLI/core action 前保持 preview-only。",
+    "language": "语言",
+    "english": "English",
+    "theme": "主题",
+    "dark": "深色",
+    "light": "浅色",
+    "density": "密度",
+    "compact": "紧凑",
+    "comfortable": "舒适",
+    "registry": "项目注册表",
+    "registryPlaceholder": "/path/to/harness-project",
+    "addProject": "添加项目",
+    "enable": "启用",
+    "disable": "停用",
+    "remove": "移除"
   },
   "inspector": {
     "title": "检查器",

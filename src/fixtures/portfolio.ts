@@ -88,6 +88,17 @@ export function freshReviewFixture(): TaskDetail {
   return {
     ...task,
     contractFiles: [createEvidence(task, "contract", "task_plan.md")],
+    materials: [{
+      id: `${task.taskKey}:task_plan.md`,
+      name: "task_plan.md",
+      type: "contract",
+      sourcePath: `${task.currentPath}/task_plan.md`,
+      dataClass: "index-safe",
+      status: "present",
+      hash: task.sourceFileHashes["task_plan.md"]
+    }],
+    artifactCount: 0,
+    findingCount: 0,
     reviewGate: {
       canConfirm: true,
       previewOnly: true,
@@ -106,6 +117,17 @@ export function staleReviewFixture(): TaskDetail {
   return {
     ...task,
     contractFiles: [createEvidence(task, "contract", "task_plan.md")],
+    materials: [{
+      id: `${task.taskKey}:task_plan.md`,
+      name: "task_plan.md",
+      type: "contract",
+      sourcePath: `${task.currentPath}/task_plan.md`,
+      dataClass: "index-safe",
+      status: "present",
+      hash: task.sourceFileHashes["task_plan.md"]
+    }],
+    artifactCount: 0,
+    findingCount: 0,
     reviewGate: {
       canConfirm: false,
       previewOnly: true,

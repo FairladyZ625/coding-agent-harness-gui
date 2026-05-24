@@ -1,8 +1,8 @@
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
-import { addProject, loadRegistry } from "./registry";
-import { buildPortfolio, confirmReviewPreview, fileUrlForLocalPath, getTaskDetail, scanProject } from "./scanner";
+import { addProject, loadRegistry, removeProject, sanitizeRegistry, updateProjectEnabled } from "./registry";
+import { buildPortfolio, confirmReviewPreview, fileUrlForLocalPath, getTaskDetail, getTaskMaterial, scanProject } from "./scanner";
 import { assertIndexSafePayload } from "../model/harnessGui";
 
 const port = Number(process.env.HARNESS_GUI_API_PORT ?? 4177);
@@ -30,13 +30,23 @@ async function route(req: http.IncomingMessage, res: http.ServerResponse): Promi
     return;
   }
   if (req.method === "GET" && url.pathname === "/api/projects") {
-    const snapshot = await buildPortfolio(loadRegistry());
-    sendJson(res, 200, snapshot.projects);
+    sendJson(res, 200, sanitizeRegistry(loadRegistry()));
     return;
   }
   if (req.method === "POST" && url.pathname === "/api/projects") {
     const body = await readJson(req);
-    sendJson(res, 201, addProject(String(body.path ?? "")));
+    sendJson(res, 201, sanitizeRegistry(addProject(String(body.path ?? ""))));
+    return;
+  }
+  const projectMatch = url.pathname.match(/^\/api\/projects\/([^/]+)$/);
+  if (req.method === "DELETE" && projectMatch) {
+    sendJson(res, 200, sanitizeRegistry(removeProject(projectMatch[1])));
+    return;
+  }
+  const projectEnableMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/enabled$/);
+  if (req.method === "PATCH" && projectEnableMatch) {
+    const body = await readJson(req);
+    sendJson(res, 200, sanitizeRegistry(updateProjectEnabled(projectEnableMatch[1], Boolean(body.enabled))));
     return;
   }
   const scanMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/scan$/);
@@ -63,6 +73,13 @@ async function route(req: http.IncomingMessage, res: http.ServerResponse): Promi
   if (req.method === "GET" && evidenceMatch) {
     const snapshot = await buildPortfolio(loadRegistry());
     sendJson(res, 200, snapshot.evidence.filter((entry) => entry.projectId === evidenceMatch[1]));
+    return;
+  }
+  const materialMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/tasks\/([^/]+)\/materials\/(.+)$/);
+  if (req.method === "GET" && materialMatch) {
+    const material = await getTaskMaterial(loadRegistry(), materialMatch[1], decodeURIComponent(materialMatch[2]), decodeURIComponent(materialMatch[3]));
+    if (!material) return sendJson(res, 404, { error: "material not found" });
+    sendJson(res, 200, material);
     return;
   }
   const openMatch = url.pathname.match(/^\/api\/projects\/([^/]+)\/files\/open$/);

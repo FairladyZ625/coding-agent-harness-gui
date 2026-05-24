@@ -50,7 +50,21 @@
     "body": "Project registry is local. Global payloads stay index-safe. Raw private files load only on demand in a later gated path.",
     "packaging": "Desktop packaging is deferred.",
     "runner": "Agent runner is deferred.",
-    "confirm": "Review confirm is preview-only until Harness CLI/core action exists."
+    "confirm": "Review confirm is preview-only until Harness CLI/core action exists.",
+    "language": "Language",
+    "english": "English",
+    "theme": "Theme",
+    "dark": "Dark",
+    "light": "Light",
+    "density": "Density",
+    "compact": "Compact",
+    "comfortable": "Comfortable",
+    "registry": "Project registry",
+    "registryPlaceholder": "/path/to/harness-project",
+    "addProject": "Add project",
+    "enable": "Enable",
+    "disable": "Disable",
+    "remove": "Remove"
   },
   "inspector": {
     "title": "Inspector",

@@ -1,5 +1,6 @@
 import { ClipboardCopy, FolderOpen, ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { ConsoleAction } from "../../../model/actions";
 import { ProjectSummary, QueueKey, TaskDetail, TaskSummary, queueLabel } from "../../../model/harnessGui";
 import { Button } from "../../../shared/ui/Button";
 import { Panel } from "../../../shared/ui/Panel";
@@ -8,12 +9,13 @@ interface TaskWorkspaceProps {
   project?: ProjectSummary;
   task?: TaskSummary | TaskDetail;
   projectTasks: TaskSummary[];
+  actions: ConsoleAction[];
   onConfirmPreview: () => void;
   onOpenPath: () => void;
   onCopyPrompt: () => void;
 }
 
-export function TaskWorkspace({ project, task, projectTasks, onConfirmPreview, onOpenPath, onCopyPrompt }: TaskWorkspaceProps) {
+export function TaskWorkspace({ project, task, projectTasks, actions, onConfirmPreview, onOpenPath, onCopyPrompt }: TaskWorkspaceProps) {
   const { t } = useTranslation("common");
   if (!project || !task) {
     return (
@@ -29,6 +31,7 @@ export function TaskWorkspace({ project, task, projectTasks, onConfirmPreview, o
 
   const detail = "reviewGate" in task ? task : undefined;
   const contractFiles = detail?.contractFiles ?? [];
+  const materials = detail?.materials ?? [];
   const primaryQueue = task.queues[0] as QueueKey;
 
   return (
@@ -47,6 +50,15 @@ export function TaskWorkspace({ project, task, projectTasks, onConfirmPreview, o
         <Button variant="primary" icon={<ShieldCheck size={16} />} disabled={!(detail?.reviewGate.canConfirm ?? false)} onClick={onConfirmPreview}>
           {t("actions.confirmPreview")}
         </Button>
+      </div>
+
+      <div className="action-model-strip">
+        {actions.slice(0, 6).map((action) => (
+          <span key={action.id} className={`action-token ${action.status ?? "ready"}`} title={action.reason ?? action.description}>
+            {action.label}
+            <em>{action.shortcut?.replace("mod", "⌘") ?? action.status}</em>
+          </span>
+        ))}
       </div>
 
       <section className="workspace-grid">
@@ -71,7 +83,9 @@ export function TaskWorkspace({ project, task, projectTasks, onConfirmPreview, o
         <Panel>
           <h3>{t("task.evidence")}</h3>
           <div className="mini-list">
-            {contractFiles.length ? contractFiles.map((entry) => (
+            {materials.length ? materials.map((material) => (
+              <span key={material.id}>{material.status}: {material.name} · {material.hash?.slice(0, 10) ?? "missing"}</span>
+            )) : contractFiles.length ? contractFiles.map((entry) => (
               <span key={entry.id}>{entry.type}: {entry.title}</span>
             )) : <span>{t("task.loadingEvidence")}</span>}
           </div>
@@ -85,7 +99,7 @@ export function TaskWorkspace({ project, task, projectTasks, onConfirmPreview, o
         </Panel>
         <Panel>
           <h3>{t("task.findings")}</h3>
-          <p>{task.queues.includes("review-blocked") || task.queues.includes("blocked") ? t("task.blockingFinding") : t("task.noBlockingFinding")}</p>
+          <p>{detail ? `${detail.findingCount} indexed finding rows.` : task.queues.includes("review-blocked") || task.queues.includes("blocked") ? t("task.blockingFinding") : t("task.noBlockingFinding")}</p>
         </Panel>
         <Panel>
           <h3>{t("task.source")}</h3>

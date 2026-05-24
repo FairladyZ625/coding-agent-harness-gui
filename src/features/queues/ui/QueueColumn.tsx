@@ -1,6 +1,8 @@
-import { AlertTriangle, Gauge, Layers3, RefreshCcw, Search, ShieldCheck } from "lucide-react";
+import { AlertTriangle, Command, Gauge, Layers3, RefreshCcw, Search, ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { PortfolioSnapshot, QueueItem, queueLabel } from "../../../model/harnessGui";
+import { ProjectSummary } from "../../../model/harnessGui";
+import { UiPreferences } from "../../../model/uiPreferences";
 import { Button } from "../../../shared/ui/Button";
 import { ConsoleView } from "../../portfolio/model/usePortfolioConsole";
 import { EvidenceList } from "../../evidence/ui/EvidenceList";
@@ -10,11 +12,18 @@ import { SettingsPanel } from "../../settings/ui/SettingsPanel";
 interface QueueColumnProps {
   view: ConsoleView;
   snapshot: PortfolioSnapshot;
+  registeredProjects: ProjectSummary[];
+  preferences: UiPreferences;
   query: string;
   selectedTaskKey?: string;
   isRefreshing: boolean;
   onQueryChange: (query: string) => void;
   onRefresh: () => void;
+  onOpenCommandPalette: () => void;
+  onAddProject: (path: string) => void;
+  onRemoveProject: (projectId: string) => void;
+  onSetProjectEnabled: (projectId: string, enabled: boolean) => void;
+  onDensityChange: (density: UiPreferences["density"]) => void;
   onSelectQueueItem: (item: QueueItem) => void;
   onSelectProject: (projectId: string) => void;
 }
@@ -35,7 +44,10 @@ export function QueueColumn(props: QueueColumnProps) {
           <p className="eyebrow">{t("app.subtitle")}</p>
           <h1>{title}</h1>
         </div>
-        <Button variant="icon" onClick={props.onRefresh} title={t("actions.refresh")} disabled={props.isRefreshing} icon={<RefreshCcw size={18} />} />
+        <div className="topbar-actions">
+          <Button variant="icon" onClick={props.onOpenCommandPalette} title={t("actions.command")} icon={<Command size={18} />} />
+          <Button variant="icon" onClick={props.onRefresh} title={t("actions.refresh")} disabled={props.isRefreshing} icon={<RefreshCcw size={18} />} />
+        </div>
       </header>
 
       <div className="metric-strip">
@@ -55,7 +67,14 @@ export function QueueColumn(props: QueueColumnProps) {
       ) : props.view === "evidence" ? (
         <EvidenceList snapshot={props.snapshot} />
       ) : props.view === "settings" ? (
-        <SettingsPanel />
+        <SettingsPanel
+          projects={props.registeredProjects}
+          preferences={props.preferences}
+          onAddProject={props.onAddProject}
+          onRemoveProject={props.onRemoveProject}
+          onSetProjectEnabled={props.onSetProjectEnabled}
+          onDensityChange={props.onDensityChange}
+        />
       ) : (
         <QueueList items={props.snapshot.queues.filter((item) => {
           const normalized = props.query.trim().toLowerCase();
