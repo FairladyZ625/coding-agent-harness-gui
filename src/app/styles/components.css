@@ -49,7 +49,8 @@
   .console-shell-left-collapsed,
   .console-shell-right-collapsed,
   .console-shell-left-collapsed.console-shell-right-collapsed {
-    display: block;
+    display: flex;
+    flex-direction: column;
     height: auto;
     min-height: 100vh;
     overflow: visible;
@@ -60,9 +61,30 @@
   .console-shell > section {
     width: 100%;
     height: auto;
-    max-height: none;
     min-height: 0;
     border-right: 0;
+  }
+
+  .console-shell > main {
+    order: 1;
+  }
+
+  .console-shell > section {
+    order: 2;
+    max-height: 64vh;
+    overflow: auto;
+  }
+
+  .console-shell > aside:first-of-type {
+    order: 3;
+    max-height: 42vh;
+    overflow: auto;
+  }
+
+  .console-shell > aside:last-of-type {
+    order: 4;
+    max-height: 54vh;
+    overflow: auto;
   }
 
   .console-resizer {
