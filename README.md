@@ -24,13 +24,13 @@ controlled runner phases.
 
 ## Planning Source
 
-Planning and task governance live in the parent private harness:
+Planning and task governance live in the embedding repository's private
+Harness workspace. This public repository intentionally does not include private
+task paths, local project paths, or dogfood fixture content.
 
-- Parent repo: `/Users/lizeyu/Projects/coding-agent-harness`
-- Module key: `gui`
-- Module docs: `.harness-private/docs/09-PLANNING/MODULES/gui/`
-- Strategy task: `.harness-private/docs/09-PLANNING/TASKS/2026-05-24-harness-gui-plm-console-strategy/`
+Module key: `gui`
 
 ## Status
 
-Initial local repository placeholder. No app runtime has been implemented yet.
+V1 implementation is in progress: local Web console, localhost service, schema
+fixtures, scanner, benchmark, and guarded preview actions.

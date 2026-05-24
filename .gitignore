@@ -1,7 +1,9 @@
 node_modules/
 dist/
+artifacts/
 build/
-.DS_Store
+tmp/
 .env
 .env.*
-tmp/
+.DS_Store
+*.log
