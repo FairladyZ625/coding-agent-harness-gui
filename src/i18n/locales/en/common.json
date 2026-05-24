@@ -1,0 +1,67 @@
+{
+  "app": {
+    "name": "Harness GUI",
+    "subtitle": "Portfolio Console",
+    "statusReady": "Local console ready",
+    "syntheticLoading": "Synthetic portfolio loaded while the local service starts."
+  },
+  "nav": {
+    "projects": "Projects",
+    "review": "Review Queue",
+    "evidence": "Evidence",
+    "settings": "Settings"
+  },
+  "actions": {
+    "refresh": "Refresh portfolio",
+    "openPath": "Open source",
+    "copyPrompt": "Copy prompt",
+    "confirmPreview": "Confirm preview",
+    "command": "Command",
+    "search": "Filter tasks, queues, evidence"
+  },
+  "metrics": {
+    "projects": "Projects",
+    "review": "Review",
+    "blocked": "Blocked",
+    "missing": "Missing"
+  },
+  "task": {
+    "contract": "Contract",
+    "progress": "Progress",
+    "evidence": "Evidence",
+    "review": "Review",
+    "findings": "Findings",
+    "source": "Source",
+    "projectSurface": "Project Task Surface",
+    "lifecycle": "Lifecycle",
+    "materials": "Materials",
+    "module": "Module",
+    "stale": "Stale",
+    "hash": "Hash",
+    "loadingGate": "Loading current gate state from the local service.",
+    "loadingEvidence": "Evidence index is loading or unavailable.",
+    "activePacket": "Active task packet indexed from Harness scanner output.",
+    "blockedPacket": "Blocked task. Check findings before continuing.",
+    "noBlockingFinding": "No blocking finding is represented in the index-safe queue state.",
+    "blockingFinding": "Blocking queue present. Inspect findings before confirm."
+  },
+  "settings": {
+    "title": "Local-only V1",
+    "body": "Project registry is local. Global payloads stay index-safe. Raw private files load only on demand in a later gated path.",
+    "packaging": "Desktop packaging is deferred.",
+    "runner": "Agent runner is deferred.",
+    "confirm": "Review confirm is preview-only until Harness CLI/core action exists."
+  },
+  "inspector": {
+    "title": "Inspector",
+    "taskKey": "Task key",
+    "project": "Project",
+    "path": "Path",
+    "hash": "Hash",
+    "stale": "Stale"
+  },
+  "empty": {
+    "title": "Select a task",
+    "body": "Choose a project and queue item to inspect its contract, evidence, and review gate."
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "app": {
+    "name": "Harness GUI",
+    "subtitle": "项目组合控制台",
+    "statusReady": "本地控制台已就绪",
+    "syntheticLoading": "本地服务启动前先载入合成项目组合。"
+  },
+  "nav": {
+    "projects": "项目",
+    "review": "审查队列",
+    "evidence": "证据",
+    "settings": "设置"
+  },
+  "actions": {
+    "refresh": "刷新项目组合",
+    "openPath": "打开来源",
+    "copyPrompt": "复制修复提示",
+    "confirmPreview": "确认预览",
+    "command": "命令",
+    "search": "筛选任务、队列、证据"
+  },
+  "metrics": {
+    "projects": "项目",
+    "review": "审查",
+    "blocked": "阻塞",
+    "missing": "缺材料"
+  },
+  "task": {
+    "contract": "合同",
+    "progress": "进度",
+    "evidence": "证据",
+    "review": "审查",
+    "findings": "发现",
+    "source": "来源",
+    "projectSurface": "项目任务面",
+    "lifecycle": "生命周期",
+    "materials": "材料",
+    "module": "模块",
+    "stale": "新鲜度",
+    "hash": "哈希",
+    "loadingGate": "正在从本地服务读取当前 gate 状态。",
+    "loadingEvidence": "证据索引正在加载或暂不可用。",
+    "activePacket": "从 Harness scanner 输出索引到的活动任务包。",
+    "blockedPacket": "任务处于阻塞状态，继续前先检查 findings。",
+    "noBlockingFinding": "index-safe 队列状态中没有阻塞 finding。",
+    "blockingFinding": "存在阻塞队列，确认前必须检查 findings。"
+  },
+  "settings": {
+    "title": "本地优先 V1",
+    "body": "项目注册表保存在本地。全局 payload 只保留索引安全字段。原始私有文件只在后续受控路径中按需加载。",
+    "packaging": "桌面打包后置。",
+    "runner": "Agent runner 后置。",
+    "confirm": "Review confirm 在接入 Harness CLI/core action 前保持 preview-only。"
+  },
+  "inspector": {
+    "title": "检查器",
+    "taskKey": "任务键",
+    "project": "项目",
+    "path": "路径",
+    "hash": "哈希",
+    "stale": "新鲜度"
+  },
+  "empty": {
+    "title": "选择任务",
+    "body": "选择一个项目和队列项，查看合同、证据和审查 gate。"
+  }
+}
