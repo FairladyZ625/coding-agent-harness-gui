@@ -12,7 +12,7 @@ export function QueueBadge({ queue, className }: { queue: QueueKey; className?: 
 function queueTone(queue: QueueKey) {
   if (queue.includes("blocked") || queue === "blocked") return "danger";
   if (queue === "missing-materials") return "warning";
-  if (queue === "closed") return "neutral";
+  if (queue === "closed" || queue === "archived") return "neutral";
   if (queue === "active") return "success";
   if (queue === "lesson-candidate") return "merged";
   return "info";

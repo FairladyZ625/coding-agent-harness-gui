@@ -82,6 +82,19 @@ export function TaskWorkspace({ project, task, projectTasks, actions, onConfirmP
             <MetaRow label={t("task.hash")} value={task.sourceSnapshotHash.slice(0, 12)} monospace />
           </dl>
         </Panel>
+        {task.archiveState === "archived" ? (
+          <Panel surface="secondary">
+            <h3 className="text-base font-semibold text-high">{t("task.archive")}</h3>
+            <dl className="mt-double grid gap-base text-sm">
+              <MetaRow label={t("task.archiveBucket")} value={task.archiveBucket ?? "unclassified"} />
+              <MetaRow label={t("task.archivedBy")} value={task.archivedBy ?? "unknown"} />
+              <MetaRow label={t("task.archivedAt")} value={task.archivedAt ?? "unknown"} />
+              <MetaRow label={t("task.reviewConfirmedBy")} value={task.reviewConfirmedBy ?? "unknown"} />
+              <MetaRow label={t("task.reviewConfirmationId")} value={task.reviewConfirmationId ?? "unknown"} />
+              <MetaRow label={t("task.releasePackage")} value={task.releasePackage ?? "none"} />
+            </dl>
+          </Panel>
+        ) : null}
         <Panel surface="secondary">
           <h3 className="text-base font-semibold text-high">{t("task.evidence")}</h3>
           <div className="mt-base grid gap-base text-sm text-normal">

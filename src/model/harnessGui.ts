@@ -10,7 +10,8 @@ export type QueueKey =
   | "missing-materials"
   | "lesson-candidate"
   | "active"
-  | "closed";
+  | "closed"
+  | "archived";
 
 export interface ProjectHealth {
   status: "passing" | "warning" | "failing" | "unknown";
@@ -27,6 +28,7 @@ export interface QueueCounts {
   lessonCandidate: number;
   active: number;
   closed: number;
+  archived: number;
 }
 
 export interface ProjectSummary {
@@ -67,6 +69,14 @@ export interface TaskSummary {
   staleReason?: string;
   evidenceCount: number;
   dataClass: DataClass;
+  archiveState?: "active" | "archived" | "soft-deleted" | "superseded";
+  archiveBucket?: string;
+  archivedBy?: string;
+  archivedAt?: string;
+  reviewConfirmedBy?: string;
+  reviewConfirmedAt?: string;
+  reviewConfirmationId?: string;
+  releasePackage?: string;
 }
 
 export interface QueueItem {
@@ -191,7 +201,8 @@ export const emptyQueueCounts = (): QueueCounts => ({
   missingMaterials: 0,
   lessonCandidate: 0,
   active: 0,
-  closed: 0
+  closed: 0,
+  archived: 0
 });
 
 export function queueLabel(queue: QueueKey): string {
@@ -202,7 +213,8 @@ export function queueLabel(queue: QueueKey): string {
     "missing-materials": "Missing Materials",
     "lesson-candidate": "Lesson Candidate",
     active: "Active",
-    closed: "Closed"
+    closed: "Closed",
+    archived: "Archived"
   }[queue];
 }
 
@@ -214,7 +226,8 @@ export function queueToCountKey(queue: QueueKey): keyof QueueCounts {
     "missing-materials": "missingMaterials",
     "lesson-candidate": "lessonCandidate",
     active: "active",
-    closed: "closed"
+    closed: "closed",
+    archived: "archived"
   } satisfies Record<QueueKey, keyof QueueCounts>;
   return map[queue];
 }
