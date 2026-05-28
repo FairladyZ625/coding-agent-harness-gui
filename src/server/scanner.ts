@@ -320,9 +320,11 @@ function buildTask(project: RegisteredProject, projectPath: string, docsRoot: st
   const reviewText = readIfExists(path.join(taskDir, "review.md"));
   const progressText = readIfExists(path.join(taskDir, "progress.md"));
   const findingsText = readIfExists(path.join(taskDir, "findings.md"));
+  const taskPlanText = readIfExists(path.join(taskDir, "task_plan.md"));
+  const archive = parseTaskTombstone(taskPlanText);
   const lifecycleState = inferLifecycle(progressText, relativeTaskDir);
   const reviewStatus = inferReviewStatus(reviewText);
-  const queues = inferQueues({ materialsReady, reviewStatus, lifecycleState, findingsText, progressText });
+  const queues = inferQueues({ materialsReady, reviewStatus, lifecycleState, findingsText, progressText, archiveState: archive.archiveState });
   const queueReasons = queues.map((queue) => reasonForQueue(queue));
 
   return {
@@ -345,7 +347,8 @@ function buildTask(project: RegisteredProject, projectPath: string, docsRoot: st
     generatedAt,
     staleState: "fresh",
     evidenceCount: contractFiles.filter((file) => fs.existsSync(path.join(taskDir, file))).length,
-    dataClass: "index-safe"
+    dataClass: "index-safe",
+    ...archive
   };
 }
 
@@ -436,8 +439,10 @@ function inferQueues(input: {
   lifecycleState: string;
   findingsText: string;
   progressText: string;
+  archiveState?: string;
 }): QueueKey[] {
   const queues = new Set<QueueKey>();
+  if (input.archiveState === "archived") return ["archived"];
   if (!input.materialsReady) queues.add("missing-materials");
   if (/blocked|pause|暂停|阻塞/i.test(input.lifecycleState) || /blocked|P0|P1|阻塞/i.test(input.findingsText)) {
     queues.add(input.reviewStatus === "ready" ? "review-blocked" : "blocked");
@@ -456,8 +461,42 @@ function reasonForQueue(queue: QueueKey): string {
     "missing-materials": "Required task contract or evidence files are missing.",
     "lesson-candidate": "Lesson candidates exist and need a governance decision.",
     active: "Task is active without a higher-priority attention queue.",
-    closed: "Task appears closed and is shown read-only."
+    closed: "Task appears closed and is shown read-only.",
+    archived: "Task is archived under a release or retention bucket."
   }[queue];
+}
+
+function parseTaskTombstone(taskPlanText: string): Pick<TaskSummary, "archiveState" | "archiveBucket" | "archivedBy" | "archivedAt" | "reviewConfirmedBy" | "reviewConfirmedAt" | "reviewConfirmationId" | "releasePackage"> {
+  const match = taskPlanText.match(/^##\s*(?:Task Tombstone|任务墓碑)\s*$([\s\S]*?)(?=^##\s+|(?![\s\S]))/im);
+  if (!match) return { archiveState: "active" };
+  const fields = fieldsFromMarkdownBlock(match[1] || "");
+  const state = normalizeField(fields.get("state")) || "soft-deleted";
+  return {
+    archiveState: state === "archived" || state === "soft-deleted" || state === "superseded" ? state : "soft-deleted",
+    archiveBucket: fields.get("retention bucket") || "",
+    archivedBy: fields.get("archived by") || "",
+    archivedAt: fields.get("archived at") || "",
+    reviewConfirmedBy: fields.get("review confirmed by") || "",
+    reviewConfirmedAt: fields.get("review confirmed at") || "",
+    reviewConfirmationId: fields.get("review confirmation id") || "",
+    releasePackage: fields.get("release package") || ""
+  };
+}
+
+function fieldsFromMarkdownBlock(block: string): Map<string, string> {
+  const fields = new Map<string, string>();
+  for (const line of block.split(/\r?\n/)) {
+    const match = line.match(/^\|\s*([^|]+?)\s*\|\s*([^|]+?)\s*\|\s*$/);
+    if (!match) continue;
+    const key = normalizeField(match[1]);
+    if (!key || key === "field" || key === "---") continue;
+    fields.set(key, match[2].trim().replace(/\\\|/g, "|"));
+  }
+  return fields;
+}
+
+function normalizeField(value?: string): string {
+  return String(value || "").trim().toLowerCase();
 }
 
 function inferLifecycle(progressText: string, taskPath: string): string {

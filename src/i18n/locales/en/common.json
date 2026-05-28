@@ -8,6 +8,7 @@
   "nav": {
     "projects": "Projects",
     "review": "Review Queue",
+    "archive": "Archive",
     "evidence": "Evidence",
     "settings": "Settings"
   },
@@ -27,13 +28,21 @@
     "projects": "Projects",
     "review": "Review",
     "blocked": "Blocked",
-    "missing": "Missing"
+    "missing": "Missing",
+    "archive": "Archive"
   },
   "task": {
     "contract": "Contract",
     "progress": "Progress",
     "evidence": "Evidence",
     "review": "Review",
+    "archive": "Archive",
+    "archiveBucket": "Archive bucket",
+    "archivedBy": "Archived by",
+    "archivedAt": "Archived at",
+    "reviewConfirmedBy": "Review confirmed by",
+    "reviewConfirmationId": "Review confirmation ID",
+    "releasePackage": "Release package",
     "findings": "Findings",
     "source": "Source",
     "projectSurface": "Project Task Surface",

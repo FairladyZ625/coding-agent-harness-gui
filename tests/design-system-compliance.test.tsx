@@ -291,11 +291,50 @@ describe("GUI design-system compliance", () => {
         <QueueBadge queue="review-needed" />
         <QueueBadge queue="lesson-candidate" />
         <QueueBadge queue="active" />
+        <QueueBadge queue="archived" />
       </>
     );
     expect(container.innerHTML).toContain("text-info");
     expect(container.innerHTML).toContain("text-merged");
     expect(container.innerHTML).toContain("text-success");
+    expect(container.innerHTML).toContain("Archived");
     expect(container.innerHTML).not.toContain("text-brand");
+  });
+
+  it("exposes archive as a first-class console view", () => {
+    const snapshot = createSyntheticPortfolio(1);
+    const { container } = render(
+      <>
+        <ProjectRail
+          view="archive"
+          projects={snapshot.projects}
+          selectedProjectId={snapshot.projects[0].id}
+          collapsed={false}
+          onViewChange={() => undefined}
+          onProjectSelect={() => undefined}
+          onToggleCollapsed={() => undefined}
+        />
+        <QueueColumn
+          view="archive"
+          snapshot={snapshot}
+          registeredProjects={snapshot.projects}
+          preferences={defaultUiPreferences}
+          query=""
+          isRefreshing={false}
+          onQueryChange={() => undefined}
+          onRefresh={() => undefined}
+          onOpenCommandPalette={() => undefined}
+          onAddProject={() => undefined}
+          onRemoveProject={() => undefined}
+          onSetProjectEnabled={() => undefined}
+          onDensityChange={() => undefined}
+          onSelectQueueItem={() => undefined}
+          onSelectProject={() => undefined}
+        />
+      </>
+    );
+    expect(container.innerHTML).toContain("Archive");
+    expect(container.innerHTML).toContain("archive");
+    expect(container.innerHTML).toContain("Archived");
   });
 });

@@ -1,4 +1,4 @@
-import { AlertTriangle, Command, Gauge, Layers3, RefreshCcw, Search, ShieldCheck } from "lucide-react";
+import { AlertTriangle, Archive, Command, Gauge, Layers3, RefreshCcw, Search, ShieldCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { PortfolioSnapshot, QueueItem, queueLabel } from "../../../model/harnessGui";
 import { ProjectSummary } from "../../../model/harnessGui";
@@ -36,6 +36,7 @@ export function QueueColumn(props: QueueColumnProps) {
   const title = {
     projects: t("nav.projects"),
     review: t("nav.review"),
+    archive: t("nav.archive"),
     evidence: t("nav.evidence"),
     settings: t("nav.settings")
   }[props.view];
@@ -58,6 +59,7 @@ export function QueueColumn(props: QueueColumnProps) {
         <Metric icon={<ShieldCheck size={16} />} label={t("metrics.review")} value={props.snapshot.portfolio.queueCounts.reviewNeeded} />
         <Metric icon={<AlertTriangle size={16} />} label={t("metrics.blocked")} value={props.snapshot.portfolio.queueCounts.blocked + props.snapshot.portfolio.queueCounts.reviewBlocked} />
         <Metric icon={<Gauge size={16} />} label={t("metrics.missing")} value={props.snapshot.portfolio.queueCounts.missingMaterials} />
+        <Metric icon={<Archive size={16} />} label={t("metrics.archive")} value={props.snapshot.portfolio.queueCounts.archived} />
       </div>
 
       <label className="mt-triple flex min-h-10 items-center gap-base rounded-sm border border-border bg-primary px-double text-low focus-within:border-brand">
@@ -82,7 +84,9 @@ export function QueueColumn(props: QueueColumnProps) {
         <QueueList items={props.snapshot.queues.filter((item) => {
           const normalized = props.query.trim().toLowerCase();
           const reviewSurface = item.queue.includes("review") || item.queue === "missing-materials" || item.queue === "blocked";
-          return reviewSurface && (!normalized || `${item.title} ${item.taskKey} ${item.reason}`.toLowerCase().includes(normalized));
+          const archiveSurface = item.queue === "archived";
+          const visibleSurface = props.view === "archive" ? archiveSurface : reviewSurface;
+          return visibleSurface && (!normalized || `${item.title} ${item.taskKey} ${item.reason}`.toLowerCase().includes(normalized));
         })} selectedTaskKey={props.selectedTaskKey} onSelect={props.onSelectQueueItem} />
       )}
     </section>

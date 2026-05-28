@@ -8,6 +8,7 @@
   "nav": {
     "projects": "项目",
     "review": "审查队列",
+    "archive": "归档",
     "evidence": "证据",
     "settings": "设置"
   },
@@ -27,13 +28,21 @@
     "projects": "项目",
     "review": "审查",
     "blocked": "阻塞",
-    "missing": "缺材料"
+    "missing": "缺材料",
+    "archive": "归档"
   },
   "task": {
     "contract": "合同",
     "progress": "进度",
     "evidence": "证据",
     "review": "审查",
+    "archive": "归档",
+    "archiveBucket": "归档分组",
+    "archivedBy": "归档人",
+    "archivedAt": "归档时间",
+    "reviewConfirmedBy": "审查确认人",
+    "reviewConfirmationId": "审查确认 ID",
+    "releasePackage": "发布包",
     "findings": "发现",
     "source": "来源",
     "projectSurface": "项目任务面",

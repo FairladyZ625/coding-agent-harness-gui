@@ -14,7 +14,7 @@ import { buildLayoutActions, buildTaskActions, ConsoleAction, filterActionsForPa
 import { PortfolioSnapshot, ProjectSummary, QueueItem, TaskDetail, TaskSummary } from "../../../model/harnessGui";
 import { defaultUiPreferences, mergeUiPreferences, parseUiPreferences, UiPreferences } from "../../../model/uiPreferences";
 
-export type ConsoleView = "projects" | "review" | "evidence" | "settings";
+export type ConsoleView = "projects" | "review" | "archive" | "evidence" | "settings";
 
 const initialSnapshot = createSyntheticPortfolio(15);
 const preferencesKey = "harness-gui-ui-preferences";
@@ -86,6 +86,7 @@ export function usePortfolioConsole() {
       if (view === "review" && !item.queue.includes("review") && item.queue !== "missing-materials" && item.queue !== "blocked") {
         return false;
       }
+      if (view === "archive" && item.queue !== "archived") return false;
       if (!normalized) return true;
       return `${item.title} ${item.taskKey} ${item.reason}`.toLowerCase().includes(normalized);
     });

@@ -1,4 +1,4 @@
-import { FileSearch, PanelLeftClose, PanelLeftOpen, Settings, ShieldCheck, SquareStack, Workflow } from "lucide-react";
+import { Archive, FileSearch, PanelLeftClose, PanelLeftOpen, Settings, ShieldCheck, SquareStack, Workflow } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { ProjectSummary } from "../../../model/harnessGui";
 import { cn } from "../../../shared/lib/cn";
@@ -19,6 +19,7 @@ export function ProjectRail({ view, projects, selectedProjectId, collapsed, onVi
   const nav = [
     { key: "projects" as const, label: t("nav.projects"), icon: <SquareStack size={18} /> },
     { key: "review" as const, label: t("nav.review"), icon: <ShieldCheck size={18} /> },
+    { key: "archive" as const, label: t("nav.archive"), icon: <Archive size={18} /> },
     { key: "evidence" as const, label: t("nav.evidence"), icon: <FileSearch size={18} /> },
     { key: "settings" as const, label: t("nav.settings"), icon: <Settings size={18} /> }
   ];

@@ -25,7 +25,8 @@ export function createSyntheticPortfolio(projectCount = 15): PortfolioSnapshot {
     const projectTasks = [
       createTask(id, index, "review-needed"),
       createTask(id, index, "missing-materials"),
-      createTask(id, index, index % 3 === 0 ? "blocked" : "active")
+      createTask(id, index, index % 3 === 0 ? "blocked" : "active"),
+      createTask(id, index, "archived")
     ];
     tasks.push(...projectTasks);
     evidence.push(
@@ -171,7 +172,7 @@ function createTask(projectId: string, projectIndex: number, queue: TaskSummary[
     projectPath: `/tmp/harness-fixtures/project-${String(projectIndex).padStart(2, "0")}`,
     currentPath: `docs/09-PLANNING/MODULES/gui/2026-05-24-${key}`,
     moduleKey: projectIndex % 2 === 0 ? "gui" : undefined,
-    lifecycleState: queue === "closed" ? "done" : queue === "blocked" ? "blocked" : "active",
+    lifecycleState: queue === "closed" || queue === "archived" ? "done" : queue === "blocked" ? "blocked" : "active",
     reviewStatus: queue === "review-needed" ? "ready" : queue === "review-blocked" ? "blocked" : "not-submitted",
     materialsReady: queue !== "missing-materials",
     queues: [queue],
@@ -188,7 +189,15 @@ function createTask(projectId: string, projectIndex: number, queue: TaskSummary[
     staleState: queue === "review-blocked" ? "stale" : "fresh",
     staleReason: queue === "review-blocked" ? "Review materials changed after card generation" : undefined,
     evidenceCount: 3,
-    dataClass: "index-safe"
+    dataClass: "index-safe",
+    archiveState: queue === "archived" ? "archived" : "active",
+    archiveBucket: queue === "archived" ? "release:fixture" : undefined,
+    archivedBy: queue === "archived" ? "Fixture Release Manager" : undefined,
+    archivedAt: queue === "archived" ? generatedAt : undefined,
+    reviewConfirmedBy: queue === "archived" ? "Fixture Reviewer" : undefined,
+    reviewConfirmedAt: queue === "archived" ? generatedAt : undefined,
+    reviewConfirmationId: queue === "archived" ? `HRC-FIXTURE-${projectIndex}` : undefined,
+    releasePackage: queue === "archived" ? "coding-agent-harness/governance/releases/fixture/INDEX.md" : undefined
   };
 }
 
@@ -214,7 +223,7 @@ export function taskToQueueItems(task: TaskSummary): QueueItem[] {
     title: task.title,
     reason: task.queueReasons[0] ?? `Task is in ${queue}`,
     exitCondition: exitConditionForQueue(queue),
-    priority: queue === "blocked" || queue === "review-blocked" ? "high" : "normal",
+    priority: queue === "blocked" || queue === "review-blocked" ? "high" : queue === "archived" ? "low" : "normal",
     sourceSnapshotHash: task.sourceSnapshotHash,
     staleState: task.staleState,
     generatedAt: task.generatedAt
@@ -239,6 +248,7 @@ function exitConditionForQueue(queue: TaskSummary["queues"][number]): string {
     "missing-materials": "Add required task contract/evidence files.",
     "lesson-candidate": "Promote, sediment, or reject the lesson candidate.",
     active: "Move to review, blocked, done, or superseded.",
-    closed: "Read-only archive state."
+    closed: "Read-only closed state.",
+    archived: "Retain under the release archive."
   }[queue];
 }
